@@ -4,12 +4,14 @@ import com.jy.jwt.dto.UserDto;
 import com.jy.jwt.entity.Authority;
 import com.jy.jwt.entity.User;
 import com.jy.jwt.repository.UserRepository;
+import com.jy.jwt.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -39,4 +41,13 @@ public class UserService {
 		return userRepository.save(user);
 	}
 
+	@Transactional(readOnly = true)
+	public Optional<User> getUserWithAuthorities(String username) {
+		return userRepository.findOneWithAuthoritiesByUsername(username);
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<User> getMyUserAuthorities() {
+		return SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername);
+	}
 }
